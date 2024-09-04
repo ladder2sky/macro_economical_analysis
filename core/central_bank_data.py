@@ -1,5 +1,4 @@
 
-import numpy as np
 import pandas as pd
 import requests
 import re
@@ -103,6 +102,13 @@ def get_l3_data_link(l2_hyper_link, indicator):
 
 
 def get_original_data(l3_hyper_link, indicator):
+    """
+        Fetches the actual data from the specified indicator page.
+
+        :param l3_hyper_link: The URL for the indicator page.
+        :param indicator: The name of the indicator (used to determine how to parse the page).
+        :return: A pandas DataFrame containing the extracted data.
+        """
     if indicator == '社会融资规模增量统计表':
         resp = requests.get(l3_hyper_link)
         resp.encoding = 'gbk'
@@ -129,6 +135,14 @@ def get_original_data(l3_hyper_link, indicator):
 
 
 def get_central_bank_data(year, category, indicator):
+    """
+        Main function to retrieve central bank data for a specified year, category, and indicator.
+
+        :param year: The year of the data (must be between 2008 and the current year).
+        :param category: The category of the data.
+        :param indicator: The specific indicator within the category.
+        :return: None, but prints the resulting DataFrame or an empty message.
+        """
     l2_hyper_link = get_l2_data_link(year, category)
     l3_hyper_link = get_l3_data_link(l2_hyper_link, indicator)
     result = get_original_data(l3_hyper_link, indicator)
