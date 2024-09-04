@@ -1,7 +1,3 @@
-"""
-from idlelib.iomenu import encoding
-from unittest.mock import inplace
-"""
 
 import numpy as np
 import pandas as pd
@@ -69,6 +65,13 @@ def get_l2_data_link(year, category_name):
 
 
 def get_l3_data_link(l2_hyper_link, indicator):
+    """
+        Get the URL of a specific indicator within a category. If the indicator is not found, return an empty string.
+
+        :param l2_hyper_link: The URL of the category page.
+        :param indicator: The name of the indicator (as a string).
+        :return: The URL of the indicator page, or an empty string if not found.
+        """
     upper_address = 'http://www.pbc.gov.cn'
     header = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
                             "Chrome/128.0.0.0 Safari/537.36 Edg/128.0.0.0"}
