@@ -39,7 +39,7 @@ def get_l2_data_link(year, category_name):
 
     l2_hyper_link = ''
     current_year = datetime.date.today().year
-    if 2008 <= year <= current_year:
+    if 2015 <= year <= current_year:
         l1_address_dict = get_year_data_link()
         year_page_link  = l1_address_dict[str(year)]
         resp = requests.get(year_page_link, headers=header)
@@ -59,7 +59,7 @@ def get_l2_data_link(year, category_name):
         else:
             print('所选年份没有找到相应指标。 get_l2_data_link函数将返回一个空的字符串。')
     else:
-        print('年份不能小于2008，不能大于{}。get_l2_data_link函数将返回一个空的字符串。'.format(current_year))
+        print('年份不能小于2015，不能大于{}。get_l2_data_link函数将返回一个空的字符串。'.format(current_year))
     return l2_hyper_link
 
 
@@ -88,7 +88,7 @@ def get_l3_data_link(l2_hyper_link, indicator):
         for it in result:
             indicator_name = it.group('name').strip()
             address = upper_address + it.group('address')
-            print(indicator_name, address)
+            # print(indicator_name, address)
             l3_address_dict[indicator_name] = address
         if l3_address_dict == {}:
             print('dict is blank.')
@@ -110,28 +110,58 @@ def get_original_data(l3_hyper_link, indicator):
         :return: A pandas DataFrame containing the extracted data.
         """
     if indicator == '社会融资规模增量统计表':
-        resp = requests.get(l3_hyper_link)
-        resp.encoding = 'gbk'
-        page = BeautifulSoup(resp.text, 'html.parser')
-        table = page.find('table')
-        trs = table.find_all('tr')
-        columns_td = trs[5].find_all('td')
-        columns = ['年月']
-        for col in columns_td:
-            if col.text !='':
-                columns.append(col.text)
-        data_lst = []
-        for tr in trs[7: 19]:
-            tds = tr.find_all('td')
-            data_dict = {}
-            for i in range(len(columns)):
-                data_dict[columns[i]] = tds[i].text
-            data_lst.append(data_dict)
-        df = pd.DataFrame(data_lst)
+        df = get_aggregate_financing_to_economy_data(l3_hyper_link)
+    elif indicator == '货币供应量':
+        df = get_money_supply_data(l3_hyper_link)
     else:
+        print("The indicator, {}, isn't developed yet. a empty df will be return.".format(indicator))
         df = pd.DataFrame()
     return df
 
+
+def get_money_supply_data(l3_hyper_link):
+    resp = requests.get(l3_hyper_link)
+    resp.encoding = 'gbk'
+    page = BeautifulSoup(resp.text, 'html.parser')
+    table = page.find('table')
+    trs = table.find_all('tr')
+    columns_td = trs[5].find_all('td')
+    columns = []
+    df = pd.DataFrame()
+    for col in columns_td:
+        if col.text != '':
+            columns.append(col.text)
+    #print(trs[7:12:2])
+    data_lst = []
+    for tr in trs[7:12:2]:
+        tds = tr.find_all('td')
+        data_dict = {}
+        for i in range(len(columns)):
+            data_dict[columns[i]] = tds[i + len(data_lst)].text # 网页中每行都往后错一位，所以加len(data_lst)
+        data_lst.append(data_dict)
+    df = pd.DataFrame(data_lst)
+    return df
+
+def get_aggregate_financing_to_economy_data(l3_hyper_link):
+    resp = requests.get(l3_hyper_link)
+    resp.encoding = 'gbk'
+    page = BeautifulSoup(resp.text, 'html.parser')
+    table = page.find('table')
+    trs = table.find_all('tr')
+    columns_td = trs[5].find_all('td')
+    columns = ['年月']
+    for col in columns_td:
+        if col.text != '':
+            columns.append(col.text)
+    data_lst = []
+    for tr in trs[7: 19]:
+        tds = tr.find_all('td')
+        data_dict = {}
+        for i in range(len(columns)):
+            data_dict[columns[i]] = tds[i].text
+        data_lst.append(data_dict)
+    df = pd.DataFrame(data_lst)
+    return df
 
 
 def get_central_bank_data(year, category, indicator):
@@ -144,12 +174,14 @@ def get_central_bank_data(year, category, indicator):
         :return: None, but prints the resulting DataFrame or an empty message.
         """
     l2_hyper_link = get_l2_data_link(year, category)
-    l3_hyper_link = get_l3_data_link(l2_hyper_link, indicator)
-    result = get_original_data(l3_hyper_link, indicator)
-    if not result.empty:
-        print(result.tail().isna())
-    else:
-        print('empty.')
+    if l2_hyper_link !='':
+        l3_hyper_link = get_l3_data_link(l2_hyper_link, indicator)
+        if l3_hyper_link !='':
+            result = get_original_data(l3_hyper_link, indicator)
+            if not result.empty:
+                return result
+            else:
+                print('Sorry, result is empty.')
+                return None
 
 
-get_central_bank_data(2024, '社会融资规模', '社会融资规模增量统计表')
