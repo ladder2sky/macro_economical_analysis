@@ -120,6 +120,12 @@ def get_original_data(l3_hyper_link, indicator):
 
 
 def get_money_supply_data(l3_hyper_link):
+    """
+        Extracts the money supply data from the indicator page and returns it as a DataFrame.
+
+        :param l3_hyper_link: The URL for the money supply indicator page.
+        :return: A pandas DataFrame containing the money supply data.
+        """
     resp = requests.get(l3_hyper_link)
     resp.encoding = 'gbk'
     page = BeautifulSoup(resp.text, 'html.parser')
@@ -142,7 +148,14 @@ def get_money_supply_data(l3_hyper_link):
     df = pd.DataFrame(data_lst)
     return df
 
+
 def get_aggregate_financing_to_economy_data(l3_hyper_link):
+    """
+        Extracts aggregate financing to the economy data and returns it as a DataFrame.
+
+        :param l3_hyper_link: The URL for the aggregate financing indicator page.
+        :return: A pandas DataFrame containing the aggregate financing data.
+        """
     resp = requests.get(l3_hyper_link)
     resp.encoding = 'gbk'
     page = BeautifulSoup(resp.text, 'html.parser')
