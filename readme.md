@@ -1,0 +1,1 @@
+it is a sample to get ppi monthly data of l2 industries of china. data source is china stats bureau. AKshare libirary was used in the sample.
