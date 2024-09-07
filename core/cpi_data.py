@@ -1,3 +1,6 @@
+"""
+scrape cpi data from national stats bureau. get_cpi_data() is the main function to be called.
+"""
 import pandas as pd
 from conf.settings import industry_l2_category_2018
 from datetime import *

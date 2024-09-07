@@ -1,3 +1,6 @@
+"""
+common functions to collect data from national stats bureau.
+"""
 import akshare as ak
 from datetime import *
 

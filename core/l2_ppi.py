@@ -1,6 +1,7 @@
 """
 主函数是get_l2_ppi(year, l2_industry)，返回dataframe结构的分行业中类ppi数据
 """
+
 import pandas as pd
 from conf.settings import industry_l2_category_2018
 from datetime import *

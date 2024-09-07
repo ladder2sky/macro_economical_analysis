@@ -1,4 +1,5 @@
 """A sample of getting input industry ppi since 2015. data will be saved in a csv file."""
+
 import sys
 import os
 from datetime import datetime
