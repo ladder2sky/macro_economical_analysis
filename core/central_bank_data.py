@@ -127,7 +127,7 @@ def get_money_supply_data(l3_hyper_link):
         :return: A pandas DataFrame containing the money supply data.
         """
     resp = requests.get(l3_hyper_link)
-    resp.encoding = 'gbk'
+    resp.encoding = 'gb2312'
     page = BeautifulSoup(resp.text, 'html.parser')
     table = page.find('table')
     trs = table.find_all('tr')
@@ -143,7 +143,7 @@ def get_money_supply_data(l3_hyper_link):
         tds = tr.find_all('td')
         data_dict = {}
         for i in range(len(columns)):
-            data_dict[columns[i]] = tds[i + len(data_lst)].text # 网页中每行都往后错一位，所以加len(data_lst)
+            data_dict[columns[i]] = tds[i + len(data_lst)].text.strip() # 网页中每行都往后错一位，所以加len(data_lst)
         data_lst.append(data_dict)
     df = pd.DataFrame(data_lst)
     return df

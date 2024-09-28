@@ -9,6 +9,12 @@ from core.nbos_api import *
 
 
 def get_path_para(year, l2_industry):
+    """
+
+    :param year: int
+    :param l2_industry: string name of l2 industry
+    :return: list contains dictionary with path and period
+    """
     l2_path_list = ['价格指数 > 分行业中类工业生产者出厂价格指数(上年同月=100)(2018 - 至今)',
                     '价格指数 > 分行业中类工业生产者出厂价格指数(上年同月=100)(2014 - 2017)']
     if year < 2014:

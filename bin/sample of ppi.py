@@ -1,22 +1,69 @@
-"""A sample of getting input industry ppi since 2015. data will be saved in a csv file."""
 import sys
 import os
 from conf.settings import industry_l2_category_2018
 import core.l2_ppi as l2_ppi
 
-
+# Get the base directory of the project
 base_path = os.path.dirname(os.path.dirname(__file__))
 sys.path.append(base_path)
 
-if __name__ == '__main__':
-    for i in range(1, len(industry_l2_category_2018)+1):
-        print('{}. {}'.format(i, industry_l2_category_2018[i-1]))
-    selection = int(input('select a industry from above.[1 to {}]: '.format(len(industry_l2_category_2018))))
-    l2_industry = industry_l2_category_2018[selection-1]
+def clean_columns(df):
+    """
+    Cleans column names by removing '工业生产者出厂价格指数(上年同月=100)' if present.
 
-    start_year = 2015
-    data_path = base_path + '\\db\\'
-    file_name = data_path + l2_industry + str(start_year) + '起ppi同月.csv'
-    l2_industry_df = l2_ppi.get_l2_ppi(start_year, l2_industry)
-    l2_industry_df.to_csv(file_name, encoding='gbk')
-    print('Data was saved to file: {}'.format(file_name))
+    Args:
+        df (DataFrame): DataFrame to be cleaned.
+
+    Returns:
+        DataFrame: Cleaned DataFrame with updated column names.
+    """
+    old_cols = df.columns
+    df.rename(columns={col: col.replace("工业生产者出厂价格指数(上年同月=100)", '') for col in old_cols}, inplace=True)
+    return df
+
+def save_to_csv(df, path, csv_file_name):
+    """
+    Saves the given DataFrame to a CSV file.
+
+    Args:
+        df (DataFrame): DataFrame to be saved.
+        path (str): Directory path to save the file.
+        csv_file_name (str): Name of the CSV file.
+    """
+    full_path = os.path.join(path, csv_file_name)
+    try:
+        df.to_csv(full_path, encoding='gbk')
+        print(f'Data was saved to file: {full_path}')
+    except Exception as e:
+        print(f"Error saving file: {e}")
+
+if __name__ == '__main__':
+    # Display industry options for user to select
+    for i, industry in enumerate(industry_l2_category_2018, start=1):
+        print(f'{i}. {industry}')
+
+    try:
+        # Get user's selection
+        selection = int(input(f'Select an industry from above [1 to {len(industry_l2_category_2018)}]: '))
+        if selection < 1 or selection > len(industry_l2_category_2018):
+            raise ValueError("Selection out of range.")
+
+        l2_industry = industry_l2_category_2018[selection - 1]
+
+        start_year = 2015
+        data_path = os.path.join(base_path, 'db')
+        file_name = f'{l2_industry}_{start_year}_ppi.csv'
+
+        # Fetch industry PPI data
+        l2_industry_df = l2_ppi.get_l2_ppi(start_year, l2_industry)
+
+        # Clean column names
+        l2_industry_df = clean_columns(l2_industry_df)
+
+        # Save to CSV file
+        save_to_csv(l2_industry_df, data_path, file_name)
+
+    except ValueError as ve:
+        print(f"Invalid input: {ve}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
