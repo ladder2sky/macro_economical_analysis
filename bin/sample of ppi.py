@@ -2,7 +2,7 @@ import sys
 import os
 from conf.settings import industry_l2_category_2018
 import core.l2_ppi as l2_ppi
-
+from core.nbos_api import save_to_csv
 # Get the base directory of the project
 base_path = os.path.dirname(os.path.dirname(__file__))
 sys.path.append(base_path)
@@ -21,21 +21,6 @@ def clean_columns(df):
     df.rename(columns={col: col.replace("工业生产者出厂价格指数(上年同月=100)", '') for col in old_cols}, inplace=True)
     return df
 
-def save_to_csv(df, path, csv_file_name):
-    """
-    Saves the given DataFrame to a CSV file.
-
-    Args:
-        df (DataFrame): DataFrame to be saved.
-        path (str): Directory path to save the file.
-        csv_file_name (str): Name of the CSV file.
-    """
-    full_path = os.path.join(path, csv_file_name)
-    try:
-        df.to_csv(full_path, encoding='gbk')
-        print(f'Data was saved to file: {full_path}')
-    except Exception as e:
-        print(f"Error saving file: {e}")
 
 if __name__ == '__main__':
     # Display industry options for user to select

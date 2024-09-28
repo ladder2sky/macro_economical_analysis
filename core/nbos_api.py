@@ -3,6 +3,8 @@ common functions to collect data from national stats bureau.
 """
 import akshare as ak
 from datetime import *
+import sys
+import os
 
 
 def month_format_convert(month_str):
@@ -77,3 +79,19 @@ def get_each_data(path, period, indicate, kind="月度数据"):
     # macro_df.sort_values(by='date', inplace=True)
     # macro_df.set_index('date', inplace=True)
     return macro_df
+
+def save_to_csv(df, path, csv_file_name):
+    """
+    Saves the given DataFrame to a CSV file.
+
+    Args:
+        df (DataFrame): DataFrame to be saved.
+        path (str): Directory path to save the file.
+        csv_file_name (str): Name of the CSV file.
+    """
+    full_path = os.path.join(path, csv_file_name)
+    try:
+        df.to_csv(full_path, encoding='gbk')
+        print(f'Data was saved to file: {full_path}')
+    except Exception as e:
+        print(f"Error saving file: {e}")
